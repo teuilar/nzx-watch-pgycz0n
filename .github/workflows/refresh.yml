@@ -1,16 +1,23 @@
 name: Refresh stock monitor
 
+# Runs on weekdays at 07:00 UTC = 7pm NZ time (NZST) / 5pm Sydney (AEST).
+# Both markets are closed by then. GitHub Actions cron is in UTC.
+# Schedules can be delayed a few minutes during peak load — that's normal.
 on:
   schedule:
     - cron: "0 7 * * 1-5"
-  workflow_dispatch:
+  workflow_dispatch:        # lets you click "Run workflow" manually from the Actions tab
 
 permissions:
-  contents: write
+  contents: write           # required so the action can commit the refreshed index.html
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    env:
+      # Forces actions to run on Node.js 24, avoiding the Node 20 deprecation
+      # taking effect June 2, 2026.
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
